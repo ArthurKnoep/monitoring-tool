@@ -14,6 +14,7 @@ let ping = require('ping');
 let libnmap = require('libnmap');
 let request = require('request');
 
+let interval = 10000;
 let lists = [
   // Place the list of server you want to monitor
 ];
@@ -89,6 +90,11 @@ function trace_serv(serv) {
                 request(serv.req_test.req, (error, respObj, response) => {
                     if (error) {
                         ret.req = false;
+                        if (error && error.code == "ETIMEDOUT") {
+                            ret.req_message = ["Timeout"];
+                        } else {
+                            ret.req_message = ["Unknown error"];
+                        }
                     } else {
                         ret.req = true;
                         ret.req_message = [];
@@ -153,7 +159,7 @@ setInterval(() => {
     }, (err) => {
         console.error(err);
     });
-}, 10000);
+}, interval);
 
 get_list_up().then((data) => {
     status = data;
@@ -164,7 +170,7 @@ get_list_up().then((data) => {
 
 let app = express();
 
-app.get("/", (req, res) => {
+app.all("/", (req, res) => {
     res.render("main.ejs", {
         servers: status,
         last_load: last_load

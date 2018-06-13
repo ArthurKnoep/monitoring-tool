@@ -1,3 +1,8 @@
+<%
+let OK = "<span style=\"color: green;\">OK</span>";
+let KO = "<span style=\"color: tomato;\">KO</span>";
+%>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -13,12 +18,12 @@
             <div class="status-wrapper">
                 <% if (typeof server.ping !== "undefined") { %>
                     <div class="ping-wrapper">
-                        <p>Status ping : <% if (server.ping) { %>OK<% } else { %>KO<% } %> </p>
+                        <p>Status ping : <% if (server.ping) { %><%- OK %><% } else { %><%- KO %><% } %> </p>
                     </div>
                 <% } %>
                 <% if (typeof server.nmap !== "undefined") { %>
                     <div class="nmap-wrapper">
-                        <p>Status nmap : <% if (server.nmap) { %>OK<% } else { %>KO<% } %> </p>
+                        <p>Status nmap : <% if (server.nmap) { %><%- OK %><% } else { %><%- KO %><% } %> </p>
                         <% server.nmap_message.forEach(function(msg) { %>
                             <p><%= msg %></p>
                         <% }); %>
@@ -26,7 +31,7 @@
                 <% } %>
                 <% if (typeof server.req !== "undefined") { %>
                     <div class="req-wrapper">
-                        <p>Status requete : <% if (server.req) { %>OK<% } else { %>KO<% } %> </p>
+                        <p>Status requete : <% if (server.req) { %><%- OK %><% } else { %><%- KO %><% } %> </p>
                         <% server.req_message.forEach(function(msg) { %>
                             <p><%= msg %></p>
                         <% }); %>
