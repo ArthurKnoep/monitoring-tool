@@ -3,7 +3,7 @@
 A very (very) simple web monitoring tool in Node.js
 
 ## Notice
-This project is a short project that I have coded in one hour (please don't judge my code)
+This project is a short project that I have coded in one hour
 
 ## How to use
 ### Setup
