@@ -11,12 +11,45 @@
 
 let express = require("express");
 let ping = require('ping');
-let libnmap = require('libnmap');
+// let libnmap = require('libnmap');
 let request = require('request');
 
 let interval = 10000;
 let lists = [
-  // Place the list of server you want to monitor
+    // Place the list of server you want to monitor
+    {
+        name: "DMZ - Front 1 Amazon",
+        host: "ec2-35-180-118-25.eu-west-3.compute.amazonaws.com",
+        mode: "ping"
+    }, {
+        name: "Levi - Git",
+        host: "git.reyah.ga",
+        mode: "req",
+        req_test: {
+            req: {
+                uri: "https://git.reyah.ga",
+                method: "GET",
+                timeout: 10000
+            },
+            output: {
+            code: [200, 201, 202, 203]
+            }
+        }
+    }, {
+        name: "Levi - Backup",
+        host: "duplicati.reyah.ga",
+        mode: "req",
+        req_test: {
+            req: {
+                uri: "https://duplicati.reyah.ga",
+                method: "GET",
+                timeout: 10000
+            },
+            output: {
+            code: [200, 201, 202, 203]
+            }
+        }
+    }
 ];
 
 function ping_host(host) {
@@ -27,17 +60,17 @@ function ping_host(host) {
     });
 }
 
-function nmap_host(host) {
-    return new Promise((resolve, reject) => {
-        let opt = {
-            range: [host]
-        };
-        libnmap.scan(opt, function(err, report) {
-            if (err) { reject(err); return; };
-            resolve(report[host].host[0].ports[0]);
-        });
-    });
-}
+// function nmap_host(host) {
+//     return new Promise((resolve, reject) => {
+//         let opt = {
+//             range: [host]
+//         };
+//         libnmap.scan(opt, function(err, report) {
+//             if (err) { reject(err); return; };
+//             resolve(report[host].host[0].ports[0]);
+//         });
+//     });
+// }
 
 function trace_serv(serv) {
     return new Promise((resolve, reject) => {
@@ -61,31 +94,31 @@ function trace_serv(serv) {
                         resolve(ret);
                 });
             }
-            if ((typeof serv.mode === "string" && serv.mode == "nmap") || (typeof serv.mode === "object" && serv.mode.indexOf("nmap") !== -1)) {
-                nmap_host(serv.host).then((data) => {
-                    let l_port = [];
-                    for (idx in data.port) {
-                        if (data.port[idx].state[0].item.state === "open")
-                            l_port.push(parseInt(data.port[idx].item.portid));
-                    }
-                    ret.nmap = true;
-                    ret.nmap_message = [];
-                    for (idx in serv.nmap) {
-                        if (l_port.indexOf(serv.nmap[idx]) === -1) {
-                            ret.nmap = false;
-                            ret.nmap_message.push("Le port "+serv.nmap[idx]+" n'est pas joignable");
-                        }
-                    }
-                    nbMode -= 1;
-                    if (nbMode <= 0)
-                        resolve(ret);
-                }, (err) => {
-                    ret.req = false;
-                    nbMode -= 1;
-                    if (nbMode <= 0)
-                        resolve(ret);
-                })
-            }
+            // if ((typeof serv.mode === "string" && serv.mode == "nmap") || (typeof serv.mode === "object" && serv.mode.indexOf("nmap") !== -1)) {
+            //     nmap_host(serv.host).then((data) => {
+            //         let l_port = [];
+            //         for (idx in data.port) {
+            //             if (data.port[idx].state[0].item.state === "open")
+            //                 l_port.push(parseInt(data.port[idx].item.portid));
+            //         }
+            //         ret.nmap = true;
+            //         ret.nmap_message = [];
+            //         for (idx in serv.nmap) {
+            //             if (l_port.indexOf(serv.nmap[idx]) === -1) {
+            //                 ret.nmap = false;
+            //                 ret.nmap_message.push("Le port "+serv.nmap[idx]+" n'est pas joignable");
+            //             }
+            //         }
+            //         nbMode -= 1;
+            //         if (nbMode <= 0)
+            //             resolve(ret);
+            //     }, (err) => {
+            //         ret.req = false;
+            //         nbMode -= 1;
+            //         if (nbMode <= 0)
+            //             resolve(ret);
+            //     })
+            // }
             if ((typeof serv.mode === "string" && serv.mode == "req") || (typeof serv.mode === "object" && serv.mode.indexOf("req") !== -1)) {
                 request(serv.req_test.req, (error, respObj, response) => {
                     if (error) {
