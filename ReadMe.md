@@ -7,15 +7,22 @@ This project is a short project that I have coded in one hour (please don't judg
 
 ## How to use
 ### Setup
-At the begining of the file `index.js` you have a variable named lists which is an array, you have to fill this array with the server you want to monitor.
+For setting the checker you have to create a file named `config.js` at the root of the folder. This file need to export two variable : `lists` and `interval`
 
-This array is an array of object, for each object you need to specify:
+```javascript
+module.exports = {
+    lists: [], //list of server to be checked
+    interval: 10000 //interval in ms for reloading
+}
+```
+
+The array `lists` is an array of object, for each object you need to specify:
 
 * `name`: The name of the server who gonna be display on the web interface
 * `host`: The IP address or the Domain name of the server
 * `mode`: A string or an array of different mode of testing
     * `ping`: Just a simple ping (print OK if the ping is positive / print KO if the ping is not positive)
-    * `nmap`: Check if a list of port is open or not, if you set `nmap` you need to specify the list of port which need to be open (see `nmap` section)
+    * `nmap`: Check if a list of port is open or not, if you set `nmap` you need to specify the list of port which need to be open (see `nmap` section) :warning: Currently disabled for security reason
     * `req`: An http request, if you set `req` you need to specify the request and the output there need for testing (see `req_test` section)
 * `nmap` (Need to be set if you use the `nmap` mode): Just set an array of port which need to be open. (The array works like an AND, example: if you set [80, 443], the port 80 AND the port 443 need to be open)
 * `req_test` (Need to be set if you use the `req` mode): This is an object, you need to set 2 key:

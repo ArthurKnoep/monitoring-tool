@@ -13,44 +13,7 @@ let express = require("express");
 let ping = require('ping');
 // let libnmap = require('libnmap');
 let request = require('request');
-
-let interval = 10000;
-let lists = [
-    // Place the list of server you want to monitor
-    {
-        name: "DMZ - Front 1 Amazon",
-        host: "ec2-35-180-118-25.eu-west-3.compute.amazonaws.com",
-        mode: "ping"
-    }, {
-        name: "Levi - Git",
-        host: "git.reyah.ga",
-        mode: "req",
-        req_test: {
-            req: {
-                uri: "https://git.reyah.ga",
-                method: "GET",
-                timeout: 10000
-            },
-            output: {
-            code: [200, 201, 202, 203]
-            }
-        }
-    }, {
-        name: "Levi - Backup",
-        host: "duplicati.reyah.ga",
-        mode: "req",
-        req_test: {
-            req: {
-                uri: "https://duplicati.reyah.ga",
-                method: "GET",
-                timeout: 10000
-            },
-            output: {
-            code: [200, 201, 202, 203]
-            }
-        }
-    }
-];
+let config = require('./config');
 
 function ping_host(host) {
     return new Promise((resolve, reject) => {
@@ -165,7 +128,7 @@ function trace_serv(serv) {
 function get_list_up() {
     return new Promise((resolve, reject) => {
         let promises = [];
-        lists.forEach(function(serv, idx) {
+        config.lists.forEach(function(serv, idx) {
             promises[idx] = trace_serv(serv);
         }, this);
         Promise.all(promises).then((data) => {
@@ -192,7 +155,7 @@ setInterval(() => {
     }, (err) => {
         console.error(err);
     });
-}, interval);
+}, config.interval);
 
 get_list_up().then((data) => {
     status = data;
