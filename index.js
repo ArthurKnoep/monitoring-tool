@@ -86,11 +86,7 @@ function trace_serv(serv) {
                 request(serv.req_test.req, (error, respObj, response) => {
                     if (error) {
                         ret.req = false;
-                        if (error && error.code == "ETIMEDOUT") {
-                            ret.req_message = ["Timeout"];
-                        } else {
-                            ret.req_message = ["Unknown error"];
-                        }
+                        ret.req_message = ["Error: " + (error.code || "Unknow error")];
                     } else {
                         ret.req = true;
                         ret.req_message = [];
