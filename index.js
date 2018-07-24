@@ -142,26 +142,67 @@ function get_date() {
     return d.getDate()+"/"+(d.getMonth() + 1)+"/"+d.getFullYear()+" "+((d.getHours() < 10) ? "0" : "")+d.getHours()+":"+((d.getMinutes() < 10) ? "0" : "")+d.getMinutes()+":"+((d.getSeconds() < 10) ? "0" : "")+d.getSeconds();
 }
 
+function send_slack_msg(msg) {
+    request({
+        url: config.slack_hook,
+        method: 'POST',
+        json: {
+            text: msg
+        }
+    });
+}
+
+function add_to_send(to_send, msg) {
+    if (to_send.length)
+        to_send += "\n";
+    to_send += msg;
+    return to_send;
+}
+
+function test_serv(list) {
+    let to_send = "";
+    list.forEach((serv) => {
+        if (serv.ping === false || serv.nmap === false || serv.req === false) {
+            if (down_serv.indexOf(serv.name) === -1) {
+                to_send = add_to_send(to_send, `The server "${serv.name}" is DOWN`);
+                down_serv.push(serv.name);
+            }
+        } else {
+            if (down_serv.indexOf(serv.name) !== -1) {
+                to_send = add_to_send(to_send, `The server "${serv.name}" is UP`);
+                while (down_serv.indexOf(serv.name) !== -1)
+                    down_serv.splice(down_serv.indexOf(serv.name), 1);
+            }
+        }
+    });
+    if (to_send.length) {
+        if (config.service_url)
+            to_send += `\n\nMore info on <https://${config.service_url}/|${config.service_url}>`;
+        send_slack_msg(to_send);
+    }
+}
+
 let status = [];
+let down_serv = [];
 let last_load = "Waiting data";
 let last_update = new Date();
 
-setInterval(() => {
+function fetch_serv() {
     get_list_up().then((data) => {
         status = data;
         last_load = get_date();
         last_update = new Date();
+        if (typeof config.slack_hook === "string")
+            test_serv(data);
     }, (err) => {
         console.error(err);
     });
-}, config.interval);
+}
 
-get_list_up().then((data) => {
-    status = data;
-    last_load = get_date();
-}, (err) => {
-    console.error(err);
-});
+setInterval(() => {
+    fetch_serv();
+}, config.interval);
+fetch_serv();
 
 let app = express();
 
@@ -173,14 +214,19 @@ app
         last_load: last_load
     });
 })
-.get('/json', (req, res) => {
+.all('/json', (req, res) => {
     res.json({
         last_update: last_update,
         data: status
+    });
+})
+.all('/slack', (req, res) => {
+    res.json({
+        text: "This is a test"
     });
 })
 .use((req, res) => {
     res.sendStatus(404);
 })
 
-app.listen(8080);
+app.listen((config.port || 8080));
