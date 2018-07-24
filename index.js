@@ -9,7 +9,8 @@
 ** By Arthur Knoepflin
 */
 
-let express = require("express");
+const express = require('express');
+const serveStatic = require('serve-static');
 let ping = require('ping');
 // let libnmap = require('libnmap');
 let request = require('request');
@@ -138,16 +139,18 @@ function get_list_up() {
 
 function get_date() {
     let d = new Date();
-    return d.getDate()+"/"+(d.getMonth() + 1)+"/"+d.getFullYear()+" "+d.getHours()+":"+d.getMinutes()+":"+d.getSeconds();
+    return d.getDate()+"/"+(d.getMonth() + 1)+"/"+d.getFullYear()+" "+((d.getHours() < 10) ? "0" : "")+d.getHours()+":"+((d.getMinutes() < 10) ? "0" : "")+d.getMinutes()+":"+((d.getSeconds() < 10) ? "0" : "")+d.getSeconds();
 }
 
 let status = [];
 let last_load = "Waiting data";
+let last_update = new Date();
 
 setInterval(() => {
     get_list_up().then((data) => {
         status = data;
         last_load = get_date();
+        last_update = new Date();
     }, (err) => {
         console.error(err);
     });
@@ -162,11 +165,22 @@ get_list_up().then((data) => {
 
 let app = express();
 
-app.all("/", (req, res) => {
-    res.render("main.ejs", {
+app
+.use("/assets", serveStatic('assets'))
+.all("/", (req, res) => {
+    res.render("template.ejs", {
         servers: status,
         last_load: last_load
     });
-});
+})
+.get('/json', (req, res) => {
+    res.json({
+        last_update: last_update,
+        data: status
+    });
+})
+.use((req, res) => {
+    res.sendStatus(404);
+})
 
 app.listen(8080);

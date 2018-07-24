@@ -1,0 +1,100 @@
+<%
+let OK = "<span style=\"color: green;\">OK</span>";
+let KO = "<span style=\"color: tomato;\">KO</span>";
+%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <meta http-equiv="refresh" content="60">
+    <link rel="stylesheet" type="text/css"
+          href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+    <link rel="stylesheet" href="assets/css/material-kit.min.css"/>
+    <link rel="stylesheet" href="assets/css/custom.css"/>
+    <title>Status Page</title>
+</head>
+<body>
+<nav class="navbar fixed-top navbar-expand-lg bg-dark">
+    <div class="navbar-translate">
+        <span>Status Page</span>
+    </div>
+</nav>
+
+<div class="main main-raised">
+    <div class="container">
+        <div class="section text-center">
+            <h2 class="title">Server list</h2>
+            <h4>Last update: <%= last_load %></h4>
+        </div>
+        <div class="row">
+            <% servers.forEach(function(server) { %>
+            <div class="col-md-6 col-sm-12">
+                <div class="card">
+                <%
+                    server.ok = true;
+                    if (server.ping === false)
+                        server.ok = false;
+                    if (server.nmap === false)
+                        server.ok = false;
+                    if (server.req === false)
+                        server.ok = false;
+                %>
+                    <div class="card-header card-header-text card-header-<% if (server.ok) { %>success<% } else { %>danger<% } %>">
+                        <div class="card-text">
+                            <h4 class="card-title"><%= server.name %></h4>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <% if (typeof server.ping !== "undefined") { %>
+                            <div class="ping-wrapper">
+                                <p>Status ping : <% if (server.ping) { %><%- OK %><% } else { %><%- KO %><% } %> </p>
+                            </div>
+                        <% } %>
+                        <% if (typeof server.nmap !== "undefined") { %>
+                            <div class="nmap-wrapper">
+                                <p>Status nmap : <% if (server.nmap) { %><%- OK %><% } else { %><%- KO %><% } %> </p>
+                                <% server.nmap_message.forEach(function(msg) { %>
+                                    <p><%= msg %></p>
+                                <% }); %>
+                            </div>
+                        <% } %>
+                        <% if (typeof server.req !== "undefined") { %>
+                            <div class="req-wrapper">
+                                <p>Status request : <% if (server.req) { %><%- OK %><% } else { %><%- KO %><% } %> </p>
+                                <% server.req_message.forEach(function(msg) { %>
+                                    <p><%= msg %></p>
+                                <% }); %>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+            <% }); %>
+        </div>
+    </div>
+</div>
+
+<footer class="footer footer-default">
+    <div class="container">
+        <nav class="float-left">
+            <ul>
+                <li>
+                    <a>Status Page</a>
+                </li>
+            </ul>
+        </nav>
+        <div class="copyright float-right">
+            &copy;
+            <script>
+                document.write(new Date().getFullYear())
+            </script>
+            , made with <i class="material-icons">favorite</i> by
+            <a href="https://arthur.knoepflin.eu/" target="blank">Arthur Knoepflin</a> using Creative Tim template.
+        </div>
+    </div>
+</footer>
+</body>
+</html>
