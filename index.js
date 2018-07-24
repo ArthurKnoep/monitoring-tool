@@ -182,6 +182,20 @@ function test_serv(list) {
     }
 }
 
+function get_slack_cmd_msg(list) {
+    let to_send = "";
+
+    list.forEach((serv) => {
+        if (serv.ping === false || serv.nmap === false || serv.req === false)
+            to_send = add_to_send(to_send, `The server "${serv.name}" is DOWN`);
+        else
+            to_send = add_to_send(to_send, `The server "${serv.name}" is UP`);
+    });
+    if (to_send.length && config.service_url)
+        to_send += `\n\nMore info on <https://${config.service_url}/|${config.service_url}>`;
+    return to_send;
+}
+
 let status = [];
 let down_serv = [];
 let last_load = "Waiting data";
@@ -222,7 +236,7 @@ app
 })
 .all('/slack', (req, res) => {
     res.json({
-        text: "This is a test"
+        text: get_slack_cmd_msg(status)
     });
 })
 .use((req, res) => {
