@@ -7,12 +7,12 @@ This project is a short project that I have coded in one hour
 
 ## How to use
 ### Setup
-For setting the checker you have to create a file named `config.js` at the root of the folder. This file need to export two variable : `lists` and `interval`
-
+For setting the checker you have to create a file named `config.js` at the root of the folder. This file need to export some variables : 
 ```javascript
 module.exports = {
     lists: [], //list of server to be checked
     interval: 10000 //interval in ms for reloading
+    port: 8080 //port for the web server
 }
 ```
 
@@ -31,12 +31,25 @@ The array `lists` is an array of object, for each object you need to specify:
         * `code` (*optional): A number or an array of number which correspond to the status code of request (The array work like an OR, example: if you set [200, 204], the request need to respond a code 200 OR 204)
         * `text` (*optional): A string or a regular expression, for testing the body response of the request. If you set a string, the body need to correspond strictly to the string, or if you set a regular expression, the body need to match to the regular expression.
 
+### Slack integration
+If you want to receive notification through slack when a service crash or is restored, you will need to add two variables in the export of the config:
+```javascript
+module.exports = {
+    service_url: "status.example.org" //(*optional) host of the current service
+    slack_hook: "https://hooks.slack.com/services/<TOKEN>/<TOKEN>/<TOKEN>" //slack web hook url
+}
+```
+
+The `service_url` variable is optional, it permits to add a link in the slack messages to the status page.  
+In order to get your `slack_hook` url, follow this page: [https://api.slack.com/incoming-webhooks](https://api.slack.com/incoming-webhooks)
+
+
 ### Use it
 Once you have setup your list of server, you have just to launch the project (with `node .` or `node index.js`), and go to http://localhost:8080 (you can change the port at the end of the file)
 
 ## Example of setup
 - Just a simple ping on a server:
-
+```javascript
         let lists = [
             {
                 host: "10.10.0.113",
@@ -44,9 +57,10 @@ Once you have setup your list of server, you have just to launch the project (wi
                 mode: "ping"
             }
         ];
+```
 
 - A ping and a nmap test on the web port for a server:
-
+```javascript
         let lists = [
             {
                 host: "10.10.0.113",
@@ -55,9 +69,9 @@ Once you have setup your list of server, you have just to launch the project (wi
                 nmap: [80]
             }
         ];
-
+```
 - A nmap test and a HTTP request on a server:
-
+```javascript
         let lists = [
             {
                 host: "10.10.0.113",
@@ -75,14 +89,14 @@ Once you have setup your list of server, you have just to launch the project (wi
                     },
                     output: {
                         code: [200, 204],
-                        text: /{(.*)}/gi
+                        text: /{[\n\s]*status:\s*(true|success)[\n\s]*}/gi
                     }
                 }
             }
         ];
-
+```
 - A ping test for multiple server:
-
+```javascript
         let lists = [
             {
                 host: "10.10.0.113",
@@ -100,3 +114,4 @@ Once you have setup your list of server, you have just to launch the project (wi
                 mode: "ping",
             }
         ];
+```
