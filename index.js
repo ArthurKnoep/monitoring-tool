@@ -50,6 +50,7 @@ function trace_serv(serv) {
         } else {
             ret.name = serv.name;
             ret.host = serv.host;
+            ret.group = serv.group;
             if ((typeof serv.mode === "string" && serv.mode == "ping") || (typeof serv.mode === "object" && serv.mode.indexOf("ping") !== -1)) {
                 ping_host(serv.host).then((isAlive) => {
                     ret.ping = isAlive;
@@ -196,7 +197,17 @@ function get_slack_cmd_msg(list) {
     return to_send;
 }
 
+function get_groups(list) {
+    let groups = [];
+    list.forEach((serv) => {
+        if (serv.group !== undefined && groups.indexOf(serv.group) === -1)
+            groups.push(serv.group);
+    })
+    return groups;
+}
+
 let status = [];
+let groups = get_groups(config.lists);
 let down_serv = [];
 let last_load = "Waiting data";
 let last_update = new Date();
@@ -225,6 +236,7 @@ app
 .all("/", (req, res) => {
     res.render("template.ejs", {
         servers: status,
+        groups,
         last_load: last_load
     });
 })

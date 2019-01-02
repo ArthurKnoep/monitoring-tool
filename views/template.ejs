@@ -29,51 +29,61 @@ let KO = "<span style=\"color: tomato;\">KO</span>";
             <h2 class="title">Server list</h2>
             <h4>Last update: <%= last_load %></h4>
         </div>
-        <div class="row">
-            <% servers.forEach(function(server) { %>
-            <div class="col-lg-4 col-md-6 col-sm-12">
-                <div class="card">
-                <%
-                    server.ok = true;
-                    if (server.ping === false)
-                        server.ok = false;
-                    if (server.nmap === false)
-                        server.ok = false;
-                    if (server.req === false)
-                        server.ok = false;
-                %>
-                    <div class="card-header card-header-text card-header-<% if (server.ok) { %>success<% } else { %>danger<% } %>">
-                        <div class="card-text">
-                            <h4 class="card-title"><%= server.name %></h4>
+        <% for (let i = 0; i < groups.length + 1; i++) { %>
+            <h6>
+                <% if (servers.length && groups[i]) { %> 
+                    <%= groups[i] %>
+                <% } else if (servers.length && groups.length > 0) { %>
+                    <%= "Other" %>
+                <% } %>
+            </h6>
+            <div class="row">
+                <% servers.forEach(function(server) { %>
+                    <% if (server.group !== groups[i]) return; %>
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="card">
+                        <%
+                            server.ok = true;
+                            if (server.ping === false)
+                                server.ok = false;
+                            if (server.nmap === false)
+                                server.ok = false;
+                            if (server.req === false)
+                                server.ok = false;
+                        %>
+                            <div class="card-header card-header-text card-header-<% if (server.ok) { %>success<% } else { %>danger<% } %>">
+                                <div class="card-text">
+                                    <h4 class="card-title"><%= server.name %></h4>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <% if (typeof server.ping !== "undefined") { %>
+                                    <div class="ping-wrapper">
+                                        <p>Status ping : <% if (server.ping) { %><%- OK %><% } else { %><%- KO %><% } %> </p>
+                                    </div>
+                                <% } %>
+                                <% if (typeof server.nmap !== "undefined") { %>
+                                    <div class="nmap-wrapper">
+                                        <p>Status nmap : <% if (server.nmap) { %><%- OK %><% } else { %><%- KO %><% } %> </p>
+                                        <% server.nmap_message.forEach(function(msg) { %>
+                                            <p><%= msg %></p>
+                                        <% }); %>
+                                    </div>
+                                <% } %>
+                                <% if (typeof server.req !== "undefined") { %>
+                                    <div class="req-wrapper">
+                                        <p>Status request : <% if (server.req) { %><%- OK %><% } else { %><%- KO %><% } %> </p>
+                                        <% server.req_message.forEach(function(msg) { %>
+                                            <p><%= msg %></p>
+                                        <% }); %>
+                                    </div>
+                                <% } %>
+                            </div>
                         </div>
                     </div>
-                    <div class="card-body">
-                        <% if (typeof server.ping !== "undefined") { %>
-                            <div class="ping-wrapper">
-                                <p>Status ping : <% if (server.ping) { %><%- OK %><% } else { %><%- KO %><% } %> </p>
-                            </div>
-                        <% } %>
-                        <% if (typeof server.nmap !== "undefined") { %>
-                            <div class="nmap-wrapper">
-                                <p>Status nmap : <% if (server.nmap) { %><%- OK %><% } else { %><%- KO %><% } %> </p>
-                                <% server.nmap_message.forEach(function(msg) { %>
-                                    <p><%= msg %></p>
-                                <% }); %>
-                            </div>
-                        <% } %>
-                        <% if (typeof server.req !== "undefined") { %>
-                            <div class="req-wrapper">
-                                <p>Status request : <% if (server.req) { %><%- OK %><% } else { %><%- KO %><% } %> </p>
-                                <% server.req_message.forEach(function(msg) { %>
-                                    <p><%= msg %></p>
-                                <% }); %>
-                            </div>
-                        <% } %>
-                    </div>
-                </div>
+                <% }); %>
             </div>
-            <% }); %>
-        </div>
+        <% } %>
     </div>
 </div>
 
