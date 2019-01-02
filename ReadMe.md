@@ -32,6 +32,7 @@ The array `lists` is an array of object, for each object you need to specify:
         * `text` (*optional): A string or a regular expression, for testing the body response of the request. If you set a string, the body need to correspond strictly to the string, or if you set a regular expression, the body need to match to the regular expression.
 
 ### Slack integration
+#### Notification
 If you want to receive notification through slack when a service crash or is restored, you will need to add two variables in the export of the config:
 ```javascript
 module.exports = {
@@ -43,6 +44,21 @@ module.exports = {
 The `service_url` variable is optional, it permits to add a link in the slack messages to the status page.  
 In order to get your `slack_hook` url, follow this page: [https://api.slack.com/incoming-webhooks](https://api.slack.com/incoming-webhooks)
 
+#### Command
+You can also configure a slack command for asking the servers status  
+Example: 
+```
+> /infra
+
+< The server "Production" is UP
+< The server "Staging" is DOWN
+<
+< More info on status.example.org
+```
+
+In order to setup your slack command you have to create a new application on `https://api.slack.com/apps` (you can reuse the same app created in the `Notification` section).  
+Go to `Slash Commands` in the `Features` menu of the app, then, create a new command.  
+In `Request URL` set the following url `https://status.example.org/slack` (of course replace the host by your host)
 
 ### Use it
 Once you have setup your list of server, you have just to launch the project (with `node .` or `node index.js`), and go to http://localhost:8080 (you can change the port at the end of the file)
