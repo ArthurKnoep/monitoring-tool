@@ -1,6 +1,15 @@
 <%
 let OK = "<span style=\"color: green;\">OK</span>";
 let KO = "<span style=\"color: tomato;\">KO</span>";
+
+function nbServInGroup(group_name, servers) {
+    let ret = 0;
+    servers.forEach((serv) => {
+        if (serv.group === group_name)
+            ret += 1;
+    });
+    return ret;
+}
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -30,6 +39,9 @@ let KO = "<span style=\"color: tomato;\">KO</span>";
             <h4>Last update: <%= last_load %></h4>
         </div>
         <% for (let i = 0; i < groups.length + 1; i++) { %>
+            <% if (nbServInGroup(groups[i], servers) === 0) {
+                continue;
+            } %>
             <h6>
                 <% if (servers.length && groups[i]) { %> 
                     <%= groups[i] %>
