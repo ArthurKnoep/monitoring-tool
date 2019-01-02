@@ -19,6 +19,7 @@ module.exports = {
 The array `lists` is an array of object, for each object you need to specify:
 
 * `name`: The name of the server who gonna be display on the web interface
+* `group`: (*optional) Permit to group some server
 * `host`: The IP address or the Domain name of the server
 * `mode`: A string or an array of different mode of testing
     * `ping`: Just a simple ping (print OK if the ping is positive / print KO if the ping is not positive)
@@ -127,6 +128,35 @@ Once you have setup your list of server, you have just to launch the project (wi
             {
                 host: "10.10.0.115",
                 name: "Front 3",
+                mode: "ping",
+            }
+        ];
+```
+- A ping test for multiple server in group:
+```javascript
+        let lists = [
+            {
+                host: "97.1.57.90",
+                group: "Front",
+                name: "Production",
+                mode: "ping",
+            },
+            {
+                host: "97.1.57.91",
+                group: "Front",
+                name: "Staging",
+                mode: "ping",
+            },
+            {
+                host: "97.1.57.92",
+                group: "Back",
+                name: "API",
+                mode: "ping",
+            },
+            {
+                host: "97.1.57.93",
+                group: "Back",
+                name: "DB",
                 mode: "ping",
             }
         ];
