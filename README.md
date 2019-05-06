@@ -30,6 +30,7 @@ The array `lists` is an array of object, for each object you need to specify:
     * `req`: Which is the parameter for the request, for more information go to https://github.com/request/request#requestoptions-callback
     * `output`: Which correpond to the test to make on the request
         * `code` (*optional): A number or an array of number which correspond to the status code of request (The array work like an OR, example: if you set [200, 204], the request need to respond a code 200 OR 204)
+        * `json` (*optional): A JSON object, for testing the body response of the request. The body need to correspond strictly to the provided JSON.
         * `text` (*optional): A string or a regular expression, for testing the body response of the request. If you set a string, the body need to correspond strictly to the string, or if you set a regular expression, the body need to match to the regular expression.
 
 ### Slack integration

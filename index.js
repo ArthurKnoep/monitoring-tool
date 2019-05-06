@@ -11,10 +11,11 @@
 
 const express = require('express');
 const serveStatic = require('serve-static');
-let ping = require('ping');
+const ping = require('ping');
+const _ = require('lodash');
 // let libnmap = require('libnmap');
-let request = require('request');
-let config = require('./config');
+const request = require('request');
+const config = require('./config');
 
 function ping_host(host) {
 	return new Promise((resolve, reject) => {
@@ -105,6 +106,18 @@ function trace_serv(serv) {
 							if (response !== serv.req_test.output.text) {
 								ret.req = false;
 								ret.req_message.push("Body incorrect");
+							}
+						}
+						if (typeof serv.req_test.output.json === "object") {
+							try {
+								const obj = JSON.parse(response);
+								if (!_.isEqual(obj, serv.req_test.output.json)) {
+									ret.req = false;
+									ret.req_message.push("JSON incorrect : \n" + response);
+								}
+							} catch (e) {
+								ret.req = false;
+								ret.req_message.push("JSON incorrect : \n" + e);
 							}
 						}
 						if (typeof serv.req_test.output.text === "object") {
