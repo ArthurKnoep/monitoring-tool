@@ -164,17 +164,17 @@ function test_serv(list) {
 	let to_send = "";
 	list.forEach((serv) => {
 		if (serv.ping === false || serv.nmap === false || serv.req === false) {
-			if (down_serv[serv.name] === 3) {
+			if (down_serv[serv.name] === config.min_try) {
 				to_send = add_to_send(to_send, `The server "${serv.name}" is DOWN`);
 				down_serv[serv.name] = (down_serv[serv.name] || 0)  + 1;
-			} else {
+			} else if (!down_serv[serv.name] || down_serv[serv.name] < config.min_try) {
 				down_serv[serv.name] = (down_serv[serv.name] || 0)  + 1;
 			}
 		} else {
-			if (down_serv[serv.name]) {
+			if (down_serv[serv.name] > config.min_try) {
 				to_send = add_to_send(to_send, `The server "${serv.name}" is UP`);
-				down_serv[serv.name] = undefined;
 			}
+			down_serv[serv.name] = undefined;
 		}
 	});
 	if (to_send.length) {

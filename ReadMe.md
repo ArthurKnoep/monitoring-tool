@@ -37,6 +37,7 @@ The array `lists` is an array of object, for each object you need to specify:
 If you want to receive notification through slack when a service crash or is restored, you will need to add two variables in the export of the config:
 ```javascript
 module.exports = {
+    min_try: 3 //minimum error count before sending notification
     service_url: "status.example.org" //(*optional) host of the current service
     slack_hook: "https://hooks.slack.com/services/<TOKEN>/<TOKEN>/<TOKEN>" //slack web hook url
 }
